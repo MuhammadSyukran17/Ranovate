@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Core colors */
+  --color-primary: #de1d1e;
+  --color-font-primary: #080c14;
+  --color-font-secondary: #55575c;
+  --color-border-primary: #e6e8eb;
+  --color-bg-secondary: #f7f8fa;
+
+  /* Red palette */
+  --color-red-50: #fce8e9;
+  --color-red-100: #f5b9b9;
+  --color-red-200: #f09798;
+  --color-red-300: #e96868;
+  --color-red-400: #e54a4b;
+  --color-red-500: #de1d1e;
+  --color-red-600: #ca1a1b;
+  --color-red-700: #9e1515;
+  --color-red-800: #7a1011;
+  --color-red-900: #5d0c0d;
+
+  /* Card step colors */
+  --color-step-1: #fce8e9;
+  --color-step-2: #fff1e6;
+  --color-step-3: #e8f6f3;
+  --color-step-4: #f5f8ff;
+  --color-step-5: #f4ecf7;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 32s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left {
+    animation: none;
+  }
+}

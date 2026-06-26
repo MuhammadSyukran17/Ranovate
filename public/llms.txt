@@ -1,0 +1,23 @@
+# Ranovate
+
+> Ranovate adalah software house asal Indonesia yang membantu bisnis tumbuh melalui desain UI/UX, pengembangan website, otomasi berbasis AI, serta konsultasi dan maintenance teknis. Fokus pada hasil nyata dengan solusi yang dirancang khusus untuk kebutuhan tiap bisnis.
+
+## Layanan
+
+- [Website Development](https://ranovate.id/layanan/website-development): Pengembangan website yang mencerminkan kualitas bisnis Anda — meningkatkan kredibilitas, peluang, dan konversi. Estimasi pengerjaan empat sampai delapan minggu.
+- [AI Integration](https://ranovate.id/layanan/ai-integration): Integrasi dan otomasi AI yang sesuai kebutuhan operasional — mulai dari AI readiness assessment, otomasi proses, AI chatbot, pelaporan otomatis, hingga pemrosesan dokumen.
+
+## Halaman
+
+- [Beranda](https://ranovate.id/): Ikhtisar Ranovate, layanan, proses kerja, portofolio, dan FAQ.
+- [Tentang Kami](https://ranovate.id/about): Cerita, nilai, dan prinsip kerja Ranovate.
+- [Assessment](https://ranovate.id/assessment): Kuis singkat (kurang dari satu menit) untuk merekomendasikan solusi yang paling tepat.
+
+## Kontak
+
+- WhatsApp: +62 821-1378-8471 (https://wa.me/6282113788471)
+
+## Catatan
+
+- Bahasa utama: Indonesia (id-ID).
+- Untuk memulai kerja sama, hubungi Ranovate via WhatsApp untuk sesi konsultasi awal gratis.
