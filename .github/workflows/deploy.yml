@@ -1,0 +1,23 @@
+name: Node.js CI/CD Auto Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Mengakses Kode di GitHub
+      uses: actions/checkout@v4
+
+    - name: Menjalankan Script Deploy di VPS via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_IP }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          bash ~/deploy.sh
