@@ -29,9 +29,28 @@ type Service = {
   href: string;
   desc: Segment[];
   body: Segment[];
+  badge?: boolean;
 };
 
 const SERVICES: Service[] = [
+  {
+    title: "Website Development",
+    icon: "/images/services/tag-web.svg",
+    href: "/layanan/website-development",
+    badge: true,
+    desc: [
+      { text: "Untuk " },
+      { text: "bisnis yang ingin tampil", bold: true },
+      { text: " lebih kredibel dan dipercaya " },
+      { text: "secara digital", bold: true },
+    ],
+    body: [
+      { text: "Calon klien And", bold: true },
+      { text: "a menilai bisnis Anda dari websitenya sebelum menghubungi Anda. Kami pastikan kesan pertama itu " },
+      { text: "mencerminkan kualitas bisnis", bold: true },
+      { text: " Anda yang sebenarnya" },
+    ],
+  },
   {
     title: "AI Integration",
     icon: "/images/services/tag-ai.svg",
@@ -51,24 +70,6 @@ const SERVICES: Service[] = [
     ],
   },
 ];
-
-const FEATURED: Service & { desc: Segment[]; body: Segment[] } = {
-  title: "Website Development",
-  icon: "/images/services/tag-web.svg",
-  href: "/layanan/website-development",
-  desc: [
-    { text: "Untuk " },
-    { text: "bisnis yang ingin tampil", bold: true },
-    { text: " lebih kredibel dan dipercaya " },
-    { text: "secara digital", bold: true },
-  ],
-  body: [
-    { text: "Calon klien And", bold: true },
-    { text: "a menilai bisnis Anda dari websitenya sebelum menghubungi Anda. Kami pastikan kesan pertama itu " },
-    { text: "mencerminkan kualitas bisnis", bold: true },
-    { text: " Anda yang sebenarnya" },
-  ],
-};
 
 function Shine({ delay }: { delay: number }) {
   const reduce = useReducedMotion();
@@ -101,22 +102,51 @@ function RichText({ segments, className, style }: { segments: Segment[]; classNa
   );
 }
 
-function SideCard({ service }: { service: Service }) {
+function ServiceCard({ service }: { service: Service }) {
   return (
-    <div
-      className="relative flex w-[456px] shrink-0 flex-col items-start gap-[16px] overflow-hidden rounded-[32px] p-[16.889px]"
-      style={SIDE_CARD_GLASS}
-    >
-      <Shine delay={0.7} />
+    <div className="group relative flex h-full w-[540px] shrink-0 flex-col items-start gap-[20px] overflow-hidden rounded-[32px] p-[20px]">
       <div
-        className="relative flex items-center justify-center rounded-full"
-        style={{ width: 37.156, height: 37.156, backgroundColor: "#420909" }}
+        className="pointer-events-none absolute inset-0 rounded-[32px] transition-opacity duration-300 group-hover:opacity-0"
+        style={SIDE_CARD_GLASS}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ backgroundImage: FEATURED_GRADIENT, border: "1px solid #424345", boxShadow: FEATURED_SHADOW }}
       >
-        <div className="relative" style={{ width: 20.267, height: 20.267 }}>
-          <Image src={service.icon} alt="" fill sizes="21px" />
+        <div className="absolute" style={{ right: -468.63, top: -110.6, width: 711.633, height: 576 }}>
+          <Image src="/images/services/ornament.svg" alt="" fill sizes="712px" className="object-fill" />
         </div>
       </div>
-      <div className="flex w-full flex-col items-start gap-[24px] text-white">
+
+      <Shine delay={0.5} />
+
+      <div className="relative flex w-full items-center justify-between">
+        <div
+          className="flex items-center justify-center rounded-full bg-[#420909] transition-colors duration-300 group-hover:bg-[#0a0a0a]"
+          style={{ width: 44, height: 44 }}
+        >
+          <div className="relative" style={{ width: 24, height: 24 }}>
+            <Image src={service.icon} alt="" fill sizes="24px" />
+          </div>
+        </div>
+        {service.badge ? (
+          <div className="flex items-center gap-[6px] rounded-[16px] bg-white/10 p-[8px] transition-colors duration-300 group-hover:bg-[#0a0a0a]">
+            <div className="flex items-center rounded-[8px] p-[4px]" style={{ backgroundColor: "#ffffff" }}>
+              <div className="relative size-[16px]">
+                <Image src="/images/services/star.svg" alt="" fill sizes="16px" />
+              </div>
+            </div>
+            <span
+              className="whitespace-nowrap text-[16px] font-normal leading-[1.4] text-white"
+              style={{ fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              Best Seller
+            </span>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="relative flex w-full flex-col items-start gap-[24px] text-white">
         <div className="flex w-full flex-col items-start gap-[6px]">
           <p
             className="w-full text-[24px] leading-[1.2]"
@@ -136,83 +166,25 @@ function SideCard({ service }: { service: Service }) {
           style={{ fontFamily: "var(--font-inter), sans-serif" }}
         />
       </div>
-    </div>
-  );
-}
 
-function FeaturedCard() {
-  return (
-    <div
-      className="relative flex w-[540px] shrink-0 flex-col items-start gap-[20px] overflow-hidden rounded-[32px] p-[20px]"
-      style={{ backgroundImage: FEATURED_GRADIENT, border: "1px solid #424345", boxShadow: FEATURED_SHADOW }}
-    >
-      <Shine delay={0.5} />
-      <div className="pointer-events-none absolute" style={{ right: -468.63, top: -110.6, width: 711.633, height: 576 }}>
-        <Image src="/images/services/ornament.svg" alt="" fill sizes="712px" className="object-fill" />
-      </div>
-
-      <div className="relative flex w-full items-center justify-between">
-        <div
-          className="flex items-center justify-center rounded-full"
-          style={{ width: 44, height: 44, backgroundColor: "#0a0a0a" }}
-        >
-          <div className="relative" style={{ width: 24, height: 24 }}>
-            <Image src={FEATURED.icon} alt="" fill sizes="24px" />
-          </div>
-        </div>
-        <div
-          className="flex items-center gap-[6px] rounded-[16px] p-[8px]"
-          style={{ backgroundColor: "#0a0a0a" }}
-        >
-          <div className="flex items-center rounded-[8px] p-[4px]" style={{ backgroundColor: "#ffffff" }}>
-            <div className="relative size-[16px]">
-              <Image src="/images/services/star.svg" alt="" fill sizes="16px" />
-            </div>
-          </div>
+      <div className="relative grid w-full grid-rows-[0fr] transition-[grid-template-rows] duration-300 group-hover:grid-rows-[1fr]">
+        <div className="overflow-hidden">
           <span
-            className="whitespace-nowrap text-[16px] font-normal leading-[1.4] text-white"
-            style={{ fontFamily: "var(--font-inter), sans-serif" }}
+            className="flex items-center justify-center gap-[8px] rounded-[18px] px-[16px] py-[14px]"
+            style={{ backgroundColor: "#0a0a0a", border: "1px solid #232426" }}
           >
-            Best Seller
+            <span
+              className="whitespace-nowrap text-[16px] font-semibold leading-[20px] text-white"
+              style={{ fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              Lihat Layanan
+            </span>
+            <span className="relative size-[16px]">
+              <Image src="/images/services/btn-arrow.svg" alt="" fill sizes="16px" />
+            </span>
           </span>
         </div>
       </div>
-
-      <div className="relative flex w-full flex-col items-start gap-[24px] text-white">
-        <div className="flex w-full flex-col items-start gap-[6px]">
-          <p
-            className="whitespace-nowrap text-[24px] leading-[1.2]"
-            style={{ fontFamily: "var(--font-host-grotesk), sans-serif", fontWeight: 500, letterSpacing: "-0.25px" }}
-          >
-            Website Development
-          </p>
-          <RichText
-            segments={FEATURED.desc}
-            className="w-full text-[14px] leading-[1.5]"
-            style={{ fontFamily: "var(--font-inter), sans-serif" }}
-          />
-        </div>
-        <RichText
-          segments={FEATURED.body}
-          className="w-full text-[12px] leading-[1.5]"
-          style={{ fontFamily: "var(--font-inter), sans-serif" }}
-        />
-      </div>
-
-      <span
-        className="relative flex items-center justify-center gap-[8px] overflow-hidden rounded-[18px] px-[16px] py-[14px]"
-        style={{ backgroundColor: "#0a0a0a", border: "1px solid #232426" }}
-      >
-        <span
-          className="whitespace-nowrap text-[16px] font-semibold leading-[20px] text-white"
-          style={{ fontFamily: "var(--font-inter), sans-serif" }}
-        >
-          Lihat Layanan
-        </span>
-        <span className="relative size-[16px]">
-          <Image src="/images/services/btn-arrow.svg" alt="" fill sizes="16px" />
-        </span>
-      </span>
     </div>
   );
 }
@@ -311,14 +283,14 @@ export default function ServicesSection() {
         key={key}
         variants={cardItem}
         custom={dir}
-        className="shrink-0"
+        className="shrink-0 self-stretch"
         style={{ transformPerspective: 1400, transformStyle: "preserve-3d", transformOrigin: "center 88%" }}
       >
-        <motion.div animate={idle?.animate} transition={idle?.transition} style={{ willChange: "transform" }}>
+        <motion.div className="h-full" animate={idle?.animate} transition={idle?.transition} style={{ willChange: "transform" }}>
           <Link
             href={href}
             aria-label={label}
-            className="block rounded-[32px] outline-none transition-transform duration-300 hover:-translate-y-[6px] focus-visible:ring-2 focus-visible:ring-white/40"
+            className="block h-full rounded-[32px] outline-none transition-transform duration-300 hover:-translate-y-[6px] focus-visible:ring-2 focus-visible:ring-white/40"
           >
             {node}
           </Link>
@@ -386,14 +358,14 @@ export default function ServicesSection() {
 
           <div className="relative w-full">
             <motion.div
-              className="flex w-full items-center justify-center gap-[24px]"
+              className="flex w-full items-stretch justify-center gap-[24px]"
               variants={cardsContainer}
               initial="hidden"
               whileInView="show"
               viewport={viewport}
             >
-              {wrapCard(<FeaturedCard />, "featured", -1, FEATURED.href, FEATURED.title)}
-              {wrapCard(<SideCard service={SERVICES[0]} />, "integration", 1, SERVICES[0].href, SERVICES[0].title)}
+              {wrapCard(<ServiceCard service={SERVICES[0]} />, "web", -1, SERVICES[0].href, SERVICES[0].title)}
+              {wrapCard(<ServiceCard service={SERVICES[1]} />, "ai", 1, SERVICES[1].href, SERVICES[1].title)}
             </motion.div>
           </div>
         </div>
