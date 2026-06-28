@@ -85,6 +85,9 @@ const CARD_GRADIENT =
 const IMAGE_OVERLAY =
   "linear-gradient(180deg, rgba(0,0,0,0.14) 50.233%, rgba(0,0,0,0.7) 100%)";
 
+const TEXT_SCRIM =
+  "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.78) 28%, rgba(0,0,0,0.88) 100%)";
+
 type Tag = { label: string; icon: string };
 
 export type Benefit = {
@@ -245,21 +248,26 @@ function BenefitCard({ benefit, dir, reduce }: { benefit: Benefit; dir: number; 
       </motion.div>
 
       <div className="relative flex flex-col gap-[6px]">
-        <motion.div className="flex flex-wrap gap-[8px]" variants={reduce ? fade : tagsContainer}>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-[-20px] bottom-[-20px] top-[-56px]"
+          style={{ backgroundImage: TEXT_SCRIM }}
+        />
+        <motion.div className="relative flex flex-wrap gap-[8px]" variants={reduce ? fade : tagsContainer}>
           {benefit.tags.map((tag) => (
             <TagPill key={tag.label} tag={tag} />
           ))}
         </motion.div>
         <motion.h3
           variants={reduce ? fade : textItem}
-          className="text-[19px] leading-[1.25] text-white"
+          className="relative text-[19px] leading-[1.25] text-white"
           style={{ fontFamily: "var(--font-host-grotesk), sans-serif", fontWeight: 500, letterSpacing: "-0.25px" }}
         >
           {benefit.title}
         </motion.h3>
         <motion.p
           variants={reduce ? fade : textItem}
-          className="text-[14px] font-normal leading-[1.5] text-white"
+          className="relative text-[14px] font-normal leading-[1.5] text-white"
           style={{ fontFamily: "var(--font-inter), sans-serif" }}
         >
           {benefit.desc}
