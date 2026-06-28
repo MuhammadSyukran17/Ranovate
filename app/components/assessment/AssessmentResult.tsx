@@ -141,7 +141,7 @@ export default function AssessmentResult() {
               className="text-[16px] leading-[1.4] text-white"
               style={{ fontFamily: "var(--font-inter), sans-serif" }}
             >
-              Ini yang paling sesuai
+              Rekomendasi untuk anda.
             </span>
           </motion.div>
 

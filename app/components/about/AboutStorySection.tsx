@@ -117,13 +117,6 @@ export default function AboutStorySection() {
   }, []);
 
   const fade: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.45 } } };
-  const container: Variants = { hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.12 } } };
-  const item: Variants = reduce
-    ? fade
-    : {
-        hidden: { opacity: 0, y: 28, filter: "blur(10px)" },
-        show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: EASE } },
-      };
   const cardsContainer: Variants = { hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : 0.14, delayChildren: reduce ? 0 : 0.1 } } };
   const cardItem: Variants = reduce
     ? fade
@@ -137,7 +130,7 @@ export default function AboutStorySection() {
       <div ref={wrapperRef} className="relative w-full" style={{ height }}>
         <div
           ref={innerRef}
-          className="absolute left-1/2 top-0 flex flex-col items-start gap-[40px] px-[100px] py-[80px]"
+          className="absolute left-1/2 top-0 flex flex-col items-start gap-[40px] px-[100px] pb-[80px] pt-[16px]"
           style={{ width: STAGE_WIDTH, transform: `translateX(-50%) scale(${scale})`, transformOrigin: "top center" }}
         >
           <div
@@ -147,50 +140,6 @@ export default function AboutStorySection() {
           >
             <Image src="/images/about/story/bg-lines.svg" alt="" fill sizes="140vw" className="object-cover" />
           </div>
-
-          <motion.div
-            className="relative z-[1] flex w-full flex-col items-start gap-[8px]"
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={VIEWPORT}
-          >
-            <motion.div
-              variants={item}
-              className="flex items-center gap-[6px] rounded-[16px] p-[8px]"
-              style={{ backgroundColor: "#0a0a0a", border: "1px solid #232426" }}
-            >
-              <span className="flex items-center rounded-[8px] p-[4px]" style={{ backgroundColor: "#9e1515" }}>
-                <span className="relative block size-[16px]">
-                  <Image src="/images/about/story/badge.svg" alt="" fill sizes="16px" />
-                </span>
-              </span>
-              <span
-                className="text-[16px] font-normal leading-[1.4]"
-                style={{ color: "#9e1515", fontFamily: "var(--font-inter), sans-serif" }}
-              >
-                Our Story
-              </span>
-            </motion.div>
-
-            <motion.div variants={item} className="flex w-full items-start gap-[24px]">
-              <h2
-                className="flex-1 text-[52px] leading-[1.3] text-white"
-                style={{ fontFamily: "var(--font-host-grotesk), sans-serif", fontWeight: 600, letterSpacing: "-0.25px" }}
-              >
-                Transforming Business Challenges into <span style={{ color: "#9e1515" }}>Digital Opportunities</span>
-              </h2>
-              <p
-                className="flex-1 text-justify text-[18px] font-light leading-[1.5]"
-                style={{ color: "#808287", fontFamily: "var(--font-inter), sans-serif" }}
-              >
-                Kami percaya bahwa teknologi bukan hanya tentang software, tetapi tentang menciptakan solusi yang
-                membantu bisnis berkembang lebih cepat. Berawal dari kebutuhan perusahaan akan sistem yang lebih
-                efisien, Ranovate hadir untuk membantu bisnis membangun produk SaaS yang modern, scalable, dan mudah
-                digunakan.
-              </p>
-            </motion.div>
-          </motion.div>
 
           <motion.div
             className="relative z-[1] flex w-[1240px] flex-col items-start gap-[24px]"
