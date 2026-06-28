@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 import { PortfolioBadgeIcon } from "../../portfolio/icons";
 import ProjectCard, { type Project } from "../../portfolio/ProjectCard";
-import { EASE } from "../../hero/motion";
+import { EASE, EASE_BACK } from "../../hero/motion";
 
 const STAGE_WIDTH = 1440;
+const DIAG_STEP = 0.09;
 
 const VIEWPORT = { once: true, amount: 0.15 } as const;
 
@@ -34,7 +35,25 @@ const PROJECTS: Project[] = [
   },
 ];
 
-const ROWS = [PROJECTS, PROJECTS, PROJECTS];
+const CARDS: Project[] = [...PROJECTS, ...PROJECTS, ...PROJECTS];
+
+function Shine({ diag, reduce }: { diag: number; reduce: boolean }) {
+  if (reduce) return null;
+  return (
+    <motion.span
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-20"
+      style={{
+        background:
+          "linear-gradient(105deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0) 62%)",
+      }}
+      initial={{ x: "-130%", opacity: 0 }}
+      whileInView={{ x: "130%", opacity: [0, 1, 1, 0] }}
+      viewport={VIEWPORT}
+      transition={{ duration: 1.1, ease: "easeInOut", delay: diag * DIAG_STEP + 0.45 }}
+    />
+  );
+}
 
 export default function PortfolioShowcaseSection() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -78,35 +97,38 @@ export default function PortfolioShowcaseSection() {
         show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.85, ease: EASE } },
       };
 
-  const gridContainer: Variants = {
-    hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.18, delayChildren: reduce ? 0 : 0.05 } },
-  };
-  const rowContainer: Variants = {
-    hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.12 } },
-  };
+  const gridContainer: Variants = { hidden: {}, show: {} };
   const cardItem: Variants = reduce
     ? fade
     : {
-        hidden: (dir: number) => ({
-          opacity: 0,
-          x: dir * 72,
-          y: 52,
-          scale: 0.9,
-          rotateY: dir * -12,
-          filter: "blur(14px)",
-        }),
-        show: {
+        hidden: { opacity: 0, y: 44, scale: 0.92, rotateX: 14, filter: "blur(16px)" },
+        show: (diag: number) => ({
           opacity: 1,
-          x: 0,
           y: 0,
           scale: 1,
-          rotateY: 0,
+          rotateX: 0,
           filter: "blur(0px)",
-          transition: { duration: 1.05, ease: EASE, opacity: { duration: 0.6 }, filter: { duration: 0.8 } },
-        },
+          transition: {
+            delay: diag * DIAG_STEP,
+            duration: 0.95,
+            ease: EASE_BACK,
+            opacity: { duration: 0.6, ease: EASE, delay: diag * DIAG_STEP },
+            filter: { duration: 0.8, ease: EASE, delay: diag * DIAG_STEP },
+          },
+        }),
       };
+  const idle = (diag: number) =>
+    reduce
+      ? {}
+      : {
+          animate: { y: [0, -6, 0] },
+          transition: {
+            duration: 6.8 + (diag % 3) * 0.5,
+            ease: "easeInOut" as const,
+            repeat: Infinity,
+            delay: diag * DIAG_STEP + 1.0,
+          },
+        };
 
   return (
     <section id="portofolio" className="relative w-full scroll-mt-[107px] overflow-hidden" style={{ backgroundColor: "#0a0a0a" }}>
@@ -185,26 +207,27 @@ export default function PortfolioShowcaseSection() {
           </motion.div>
 
           <motion.div
-            className="flex w-full flex-col gap-[20px]"
+            className="grid w-full grid-cols-3 gap-[20px]"
             variants={gridContainer}
             initial="hidden"
             whileInView="show"
             viewport={VIEWPORT}
           >
-            {ROWS.map((row, rowIndex) => {
-              const dir = rowIndex % 2 === 0 ? -1 : 1;
+            {CARDS.map((project, i) => {
+              const diag = Math.floor(i / 3) + (i % 3);
               return (
-                <motion.div key={rowIndex} className="grid grid-cols-3 gap-[20px]" variants={rowContainer}>
-                  {row.map((project) => (
-                    <motion.div
-                      key={`${rowIndex}-${project.title}`}
-                      variants={cardItem}
-                      custom={dir}
-                      style={{ transformPerspective: 1200, willChange: "transform" }}
-                    >
+                <motion.div
+                  key={i}
+                  variants={cardItem}
+                  custom={diag}
+                  style={{ transformPerspective: 1200, willChange: "transform" }}
+                >
+                  <motion.div {...idle(diag)}>
+                    <div className="relative">
                       <ProjectCard project={project} compact />
-                    </motion.div>
-                  ))}
+                      <Shine diag={diag} reduce={reduce} />
+                    </div>
+                  </motion.div>
                 </motion.div>
               );
             })}
