@@ -2,8 +2,17 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
-import { motion, useInView, useReducedMotion, type Variants } from "motion/react";
-import { EASE, EASE_BACK } from "./hero/motion";
+import {
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionTemplate,
+  type Variants,
+} from "motion/react";
+import { EASE } from "./hero/motion";
 
 const STAGE_WIDTH = 1440;
 const STAGE_HEIGHT = 1178;
@@ -12,7 +21,7 @@ const HUB_X = 719;
 const HUB_Y = 793;
 const CARD_WIDTH = 468;
 const CARD_HALF_HEIGHT = 57.5;
-const EMANATE_FACTOR = 0.5;
+const EMANATE_FACTOR = 0.24;
 
 type CardOffset = { dx: number; dy: number };
 
@@ -20,23 +29,16 @@ const CENTER_GRADIENT =
   "linear-gradient(180deg, #0a0a0a 0%, rgba(10,10,10,0) 10%, rgba(10,10,10,0.428) 80%, #0a0a0a 100%)";
 
 const CARD_GLASS: CSSProperties = {
-  backgroundColor: "rgba(20,20,20,0.55)",
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
+  backgroundColor: "rgba(17,17,18,0.82)",
   border: "1px solid rgba(255,255,255,0.06)",
   boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.05)",
 };
 
 const CARD_GLASS_LIGHT: CSSProperties = {
-  backgroundColor: "rgba(20,20,20,0.32)",
-  backdropFilter: "blur(12px)",
-  WebkitBackdropFilter: "blur(12px)",
+  backgroundColor: "rgba(18,18,19,0.6)",
   border: "1px solid rgba(255,255,255,0.05)",
   boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.04)",
 };
-
-const LINE_GLOW =
-  "drop-shadow(0 0 2px rgba(255,255,255,0.9)) drop-shadow(0 0 6px rgba(255,120,90,0.7)) drop-shadow(0 0 14px rgba(158,21,21,0.55))";
 
 type Principle = {
   title: string;
@@ -178,12 +180,23 @@ function LinePulse({ viewBox, path, dir, duration, play }: {
     if (pathRef.current) setLength(pathRef.current.getTotalLength());
   }, []);
 
-  const segment = length * 0.14;
+  const seg = length * 0.1;
+  const dash = `${seg} ${length - seg}`;
+  const drawDur = 0.7;
+  const style = {
+    strokeDashoffset: 0,
+    animation: `principles-pulse ${duration}s linear ${drawDur}s infinite`,
+    "--pulse-off": `${-dir * length}`,
+  } as CSSProperties;
+  const drawStyle = {
+    strokeDasharray: length,
+    strokeDashoffset: dir === 1 ? length : -length,
+    animation: `principles-draw ${drawDur}s cubic-bezier(0.16,1,0.3,1) forwards, principles-fade-out 0.4s ease ${drawDur}s forwards`,
+  } as CSSProperties;
 
   return (
     <svg
       className="absolute inset-0 h-full w-full overflow-visible"
-      style={{ contain: "paint", isolation: "isolate" }}
       viewBox={viewBox}
       fill="none"
       preserveAspectRatio="none"
@@ -191,17 +204,12 @@ function LinePulse({ viewBox, path, dir, duration, play }: {
     >
       <path ref={pathRef} d={path} stroke="none" />
       {play && length > 0 && (
-        <motion.path
-          d={path}
-          stroke="#ffd9c2"
-          strokeWidth={2}
-          strokeLinecap="round"
-          style={{ filter: "drop-shadow(0 0 4px #ff3b1e) drop-shadow(0 0 9px #9e1515)" }}
-          strokeDasharray={`${segment} ${length - segment}`}
-          initial={{ strokeDashoffset: 0 }}
-          animate={{ strokeDashoffset: -dir * length }}
-          transition={{ duration, ease: "linear", repeat: Infinity }}
-        />
+        <>
+          <path d={path} stroke="#ffe6d6" strokeWidth={2} strokeLinecap="round" style={drawStyle} />
+          <path d={path} stroke="#9e1515" strokeWidth={6} strokeLinecap="round" opacity={0.3} strokeDasharray={dash} style={style} />
+          <path d={path} stroke="#ff3b1e" strokeWidth={3.6} strokeLinecap="round" opacity={0.7} strokeDasharray={dash} style={style} />
+          <path d={path} stroke="#ffd9c2" strokeWidth={1.6} strokeLinecap="round" strokeDasharray={dash} style={style} />
+        </>
       )}
     </svg>
   );
@@ -232,45 +240,57 @@ export default function PrinciplesSection() {
   }, []);
 
   const reduce = useReducedMotion();
-  const [cardsSettled, setCardsSettled] = useState(false);
+  const [sweepDone, setSweepDone] = useState(false);
   const viewport = { once: true, amount: 0.25 } as const;
   const fade: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.5 } } };
 
+  const { scrollYProgress } = useScroll({ target: wrapperRef, offset: ["start end", "end start"] });
+  const bgGlowYRaw = useTransform(scrollYProgress, [0, 1], [-80, 80]);
+  const bgGlowY = useSpring(bgGlowYRaw, { stiffness: 70, damping: 24, mass: 0.5 });
+  const bgGlowTransform = useMotionTemplate`translateY(${bgGlowY}px)`;
+
   const headerContainer: Variants = {
     hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.14, delayChildren: reduce ? 0 : 0.1 } },
+    show: { transition: { staggerChildren: reduce ? 0 : 0.12, delayChildren: reduce ? 0 : 0.15 } },
   };
   const badgeItem: Variants = reduce
     ? fade
-    : { hidden: { opacity: 0, scale: 0.82 }, show: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: EASE_BACK } } };
+    : {
+        hidden: { opacity: 0, scale: 0.92 },
+        show: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: EASE } },
+      };
   const headingItem: Variants = reduce
     ? fade
     : {
-        hidden: { opacity: 0, y: 22 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.95, ease: EASE } },
+        hidden: { opacity: 0, y: 26, filter: "blur(10px)" },
+        show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 1.05, ease: EASE } },
       };
 
   const glowItem: Variants = reduce
     ? fade
-    : { hidden: { opacity: 0, scale: 1.08 }, show: { opacity: 1, scale: 1, transition: { duration: 1.6, ease: EASE } } };
+    : {
+        hidden: { opacity: 0, scale: 1.04 },
+        show: { opacity: 1, scale: 1, transition: { duration: 1.8, ease: EASE } },
+      };
 
   const linesContainer: Variants = {
     hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.1, delayChildren: reduce ? 0 : 1.05 } },
+    show: { transition: { staggerChildren: reduce ? 0 : 0.12, delayChildren: reduce ? 0 : 0.5 } },
   };
-  const lineItem: Variants = reduce
-    ? fade
-    : { hidden: { opacity: 0, scale: 0.5 }, show: { opacity: 1, scale: 1, transition: { duration: 0.7, ease: EASE } } };
+  const lineItem: Variants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: 0.5, ease: EASE } },
+  };
 
   const cardsContainer: Variants = {
     hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.13, delayChildren: reduce ? 0 : 0.65 } },
+    show: { transition: { staggerChildren: reduce ? 0 : 0.13, delayChildren: reduce ? 0 : 0.8 } },
   };
   const cardItem: Variants = reduce
     ? fade
     : {
-        hidden: (offset: CardOffset) => ({ opacity: 0, scale: 0.66, x: offset.dx, y: offset.dy }),
-        show: { opacity: 1, scale: 1, x: 0, y: 0, transition: { duration: 0.95, ease: EASE_BACK } },
+        hidden: (offset: CardOffset) => ({ opacity: 0, scale: 0.94, x: offset.dx, y: offset.dy }),
+        show: { opacity: 1, scale: 1, x: 0, y: 0, transition: { duration: 1.05, ease: EASE } },
       };
 
   return (
@@ -299,6 +319,27 @@ export default function PrinciplesSection() {
               sizes="1440px"
               className="object-cover"
             />
+            {inView && !reduce && (
+              <div
+                className="principles-chip-glow pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(40% 38% at 50% 45%, rgba(255,90,55,0.5) 0%, rgba(158,21,21,0) 70%)",
+                }}
+              />
+            )}
+            {inView && !reduce && !sweepDone && (
+              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div
+                  className="principles-sweep absolute inset-y-[-15%] -left-1/2 w-1/2"
+                  style={{
+                    background:
+                      "linear-gradient(105deg, transparent 0%, rgba(255,210,185,0.1) 35%, rgba(255,240,230,0.42) 50%, rgba(255,210,185,0.1) 65%, transparent 100%)",
+                  }}
+                  onAnimationEnd={() => setSweepDone(true)}
+                />
+              </div>
+            )}
             <div className="absolute inset-0" style={{ backgroundImage: CENTER_GRADIENT }} />
           </motion.div>
           <motion.div
@@ -306,9 +347,12 @@ export default function PrinciplesSection() {
             style={{ left: -607, bottom: -475.71, width: 2033.764, height: 1317.705 }}
             variants={glowItem}
           >
-            <div className="absolute inset-[-11.33%_0_-11.33%_-7.24%]">
+            <motion.div
+              className="absolute inset-[-11.33%_0_-11.33%_-7.24%]"
+              style={reduce ? undefined : { transform: bgGlowTransform, willChange: "transform" }}
+            >
               <Image src="/images/principles/bg-glow.svg" alt="" fill sizes="2200px" className="object-fill" />
-            </div>
+            </motion.div>
           </motion.div>
 
           <motion.div
@@ -368,10 +412,7 @@ export default function PrinciplesSection() {
               >
                 <div className={`flex-none ${line.innerClass}`}>
                   <div className="relative" style={{ width: line.boxWidth, height: line.boxHeight }}>
-                    <div
-                      className={`absolute ${line.insetClass}`}
-                      style={{ filter: LINE_GLOW, transform: "translateZ(0)" }}
-                    >
+                    <div className={`absolute ${line.insetClass}`}>
                       <Image
                         src={line.src}
                         alt=""
@@ -379,8 +420,6 @@ export default function PrinciplesSection() {
                         sizes="360px"
                         className="object-fill"
                       />
-                    </div>
-                    <div className={`absolute ${line.insetClass}`}>
                       <LinePulse
                         viewBox={line.viewBox}
                         path={line.path}
@@ -395,14 +434,9 @@ export default function PrinciplesSection() {
             ))}
           </motion.div>
 
-          <motion.div
-            className="absolute inset-0"
-            variants={cardsContainer}
-            onAnimationComplete={() => setCardsSettled(true)}
-          >
+          <motion.div className="absolute inset-0" variants={cardsContainer}>
             {PRINCIPLES.map((p) => {
               const glass = p.translucent ? CARD_GLASS_LIGHT : CARD_GLASS;
-              const settledGlass = cardsSettled || reduce;
               const offset: CardOffset = {
                 dx: (HUB_X - (p.left + CARD_WIDTH / 2)) * EMANATE_FACTOR,
                 dy: (HUB_Y - (p.top + CARD_HALF_HEIGHT)) * EMANATE_FACTOR,
@@ -416,13 +450,22 @@ export default function PrinciplesSection() {
                   top: p.top,
                   width: CARD_WIDTH,
                   transformPerspective: 1000,
+                  contain: "paint",
                   ...glass,
-                  ...(settledGlass
-                    ? null
-                    : { backdropFilter: "none", WebkitBackdropFilter: "none" }),
                 }}
                 variants={cardItem}
                 custom={offset}
+                whileHover={
+                  reduce
+                    ? undefined
+                    : {
+                        y: -4,
+                        borderColor: "rgba(255,255,255,0.14)",
+                        boxShadow:
+                          "inset 0 1px 0 0 rgba(255,255,255,0.07), 0 20px 50px -22px rgba(158,21,21,0.55)",
+                        transition: { duration: 0.18, ease: EASE },
+                      }
+                }
               >
                 <div
                   className="flex items-center justify-center rounded-full"

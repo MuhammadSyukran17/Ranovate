@@ -56,3 +56,57 @@ body {
     animation: none;
   }
 }
+
+@keyframes principles-pulse {
+  to {
+    stroke-dashoffset: var(--pulse-off);
+  }
+}
+
+@keyframes principles-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes principles-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes principles-chip-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.62;
+    transform: scale(1.04);
+  }
+}
+
+.principles-chip-glow {
+  animation: principles-chip-glow 4.5s ease-in-out infinite;
+}
+
+@keyframes principles-sweep {
+  from {
+    transform: translateX(0) skewX(-14deg);
+  }
+  to {
+    transform: translateX(300%) skewX(-14deg);
+  }
+}
+
+.principles-sweep {
+  animation: principles-sweep 2s cubic-bezier(0.4, 0, 0.2, 1) 0.45s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .principles-chip-glow,
+  .principles-sweep {
+    animation: none;
+  }
+}
